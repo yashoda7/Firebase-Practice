@@ -7,6 +7,8 @@ import 'app_state.dart';
 import 'guest_book.dart';                       // new
 import 'src/authentication.dart';                 // new
 import 'src/widgets.dart';
+import 'yes_no_selection.dart';
+// import 'app_state.Attending';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -40,20 +42,33 @@ class HomePage extends StatelessWidget {
             color: Colors.grey,
           ),
           Consumer<ApplicationState>(
-            builder: (context, appState, _) => Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (appState.loggedIn) ...[
-                  const Header('Discussion'),
-                  GuestBook(
-                    addMessage: (message) =>
-                        appState.addMessageToGuestBook(message),
-                    messages: appState.guestBookMessages, // new
-                  ),
-                ],
-              ],
+  builder: (context, appState, _) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Add from here...
+      switch (appState.attendees) {
+        1 => const Paragraph('1 person going'),
+        >= 2 => Paragraph('${appState.attendees} people going'),
+        _ => const Paragraph('No one going'),
+      },
+      // ...to here.
+          if (appState.loggedIn) ...[
+            // Add from here...
+            YesNoSelection(
+              state: appState.attending,
+              onSelection: (attending) => appState.attending = attending,
             ),
-          ),
+            // ...to here.
+            const Header('Discussion'),
+            GuestBook(
+              addMessage: (message) =>
+                  appState.addMessageToGuestBook(message),
+              messages: appState.guestBookMessages,
+            ),
+          ],
+        ],
+      ),
+     ),
         ],
       ),
     );
